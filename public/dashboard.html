@@ -1,123 +1,452 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard</title>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — Job Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2a2d3a;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --text: #e8eaf0;
+      --muted: #7a7f9a;
+      --danger: #ff5c7a;
+    }
+
     body {
-      font-family: Arial;
-      background-color: #f4f6f8;
-      text-align: center;
-      padding: 40px;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 24px;
+      background-image: radial-gradient(ellipse at 10% 10%, rgba(108,99,255,0.07) 0%, transparent 55%),
+                        radial-gradient(ellipse at 90% 90%, rgba(0,212,170,0.05) 0%, transparent 55%);
     }
 
-    h1, h2 {
-      color: #333;
+    .container { max-width: 900px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+      gap: 16px;
     }
 
-    p {
-      color: #555;
+    .header-left h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--text) 30%, var(--muted) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    a {
-      display: inline-block;
-      margin: 10px;
-      padding: 10px 15px;
-      background-color: #007bff;
+    .header-left p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
       color: white;
       text-decoration: none;
-      border-radius: 5px;
+      padding: 11px 20px;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(108,99,255,0.3);
+      white-space: nowrap;
+    }
+    .btn-add:hover { background: #7c74ff; transform: translateY(-1px); }
+    .btn-add::before { content: '+'; font-size: 1.1rem; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
     }
 
-    a:hover {
-      background-color: #0056b3;
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 16px;
+      transition: border-color 0.2s;
     }
 
-    ul {
-      list-style: none;
-      padding: 0;
+    .stat-card:hover { border-color: var(--accent); }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    li {
-      background: white;
-      margin: 10px auto;
-      padding: 12px;
-      width: 220px;
-      border-radius: 6px;
-      box-shadow: 0 0 6px rgba(0,0,0,0.1);
-      font-weight: bold;
+    .stat-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
 
-    h3 {
-      margin-top: 20px;
-      color: #333;
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
     }
 
-    table {
-      margin: 20px auto;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 6px;
-      box-shadow: 0 0 6px rgba(0,0,0,0.1);
-      text-align: center;
+  
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(108,99,255,0.15);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .search-input {
+      margin-left: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 7px 16px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+      width: 200px;
+      transition: border-color 0.2s;
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus { border-color: var(--accent); }
+
+    /* Table */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       overflow: hidden;
     }
 
-    th, td {
-      padding: 10px 15px;
-      border-bottom: 1px solid #ddd;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: rgba(108,99,255,0.08);
+      border-bottom: 1px solid var(--border);
     }
 
     th {
-      background-color: #007bff;
-      color: white;
+      padding: 13px 16px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      text-align: left;
     }
 
-    hr {
-      margin: 30px;
+    td {
+      padding: 14px 16px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
     }
+
+    tr:last-child td { border-bottom: none; }
+
+    tbody tr { transition: background 0.15s; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+    .company-name { font-weight: 600; color: var(--text); }
+    .role-name { color: var(--muted); font-size: 0.85rem; }
+    .date-text { color: var(--muted); font-size: 0.83rem; }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .badge-Applied    { background: rgba(108,99,255,0.15); color: #a09cff; }
+    .badge-Interview  { background: rgba(245,166,35,0.15);  color: #f5c842; }
+    .badge-Offer      { background: rgba(0,212,170,0.15);   color: #00d4aa; }
+    .badge-Rejected   { background: rgba(255,92,122,0.15);  color: #ff7a94; }
+    .badge-Saved      { background: rgba(122,127,154,0.15); color: #9a9fb8; }
+
+    /* Delete button */
+    .btn-delete {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .btn-delete:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: rgba(255,92,122,0.08);
+    }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .empty h3 { font-family: 'Syne', sans-serif; color: var(--text); margin-bottom: 6px; }
+    .empty a {
+      display: inline-block;
+      margin-top: 16px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .empty a:hover { text-decoration: underline; }
+
+    /* Home link */
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 28px;
+      transition: color 0.2s;
+    }
+    .home-link:hover { color: var(--text); }
+    .home-link::before { content: '←'; }
+
+    .deadline-soon { color: #f5a623; font-size: 0.78rem; }
   </style>
 </head>
-
 <body>
+<div class="container">
 
-  <h1>Internship / Job Tracker</h1>
+  <a href="index.html" class="home-link">Home</a>
 
-  <h2>Dashboard</h2>
-  <p>Track your job applications</p>
+  <div class="header">
+    <div class="header-left">
+      <h1>Dashboard</h1>
+      <p>Track your internship &amp; job applications</p>
+    </div>
+    <a href="add.html" class="btn-add">Add Application</a>
+  </div>
 
-  <ul>
-    <li>Applied: 2</li>
-    <li>Interview: 1</li>
-    <li>Rejected: 0</li>
-  </ul>
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label"><span class="stat-dot" style="background:#7a7f9a"></span>Total</div>
+      <div class="stat-value" id="count-total">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span class="stat-dot" style="background:#a09cff"></span>Applied</div>
+      <div class="stat-value" id="count-applied">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span class="stat-dot" style="background:#f5c842"></span>Interview</div>
+      <div class="stat-value" id="count-interview">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span class="stat-dot" style="background:#00d4aa"></span>Offer</div>
+      <div class="stat-value" id="count-offer">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span class="stat-dot" style="background:#ff7a94"></span>Rejected</div>
+      <div class="stat-value" id="count-rejected">0</div>
+    </div>
+  </div>
 
-  <hr>
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="All" onclick="setFilter(this)">All</button>
+    <button class="filter-btn" data-filter="Saved" onclick="setFilter(this)">Saved</button>
+    <button class="filter-btn" data-filter="Applied" onclick="setFilter(this)">Applied</button>
+    <button class="filter-btn" data-filter="Interview" onclick="setFilter(this)">Interview</button>
+    <button class="filter-btn" data-filter="Offer" onclick="setFilter(this)">Offer</button>
+    <button class="filter-btn" data-filter="Rejected" onclick="setFilter(this)">Rejected</button>
+    <input class="search-input" type="text" placeholder="Search company or role..." oninput="renderTable()" id="search" />
+  </div>
 
-  <h3>Recent Applications</h3>
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Company / Role</th>
+          <th>Status</th>
+          <th>Date Applied</th>
+          <th>Deadline</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="job-table"></tbody>
+    </table>
+    <div id="empty-state" class="empty" style="display:none">
+      <div class="empty-icon">📋</div>
+      <h3>No applications yet</h3>
+      <p>Start tracking your job search.</p>
+      <a href="add.html">+ Add your first application</a>
+    </div>
+  </div>
 
-  <table>
-    <tr>
-      <th>Company</th>
-      <th>Role</th>
-      <th>Status</th>
-    </tr>
-    <tr>
-      <td>Google</td>
-      <td>Software Intern</td>
-      <td>Applied</td>
-    </tr>
-    <tr>
-      <td>Amazon</td>
-      <td>SDE Intern</td>
-      <td>Interview</td>
-    </tr>
-  </table>
+</div>
 
-  <hr>
+<script>
+  let currentFilter = 'All';
 
-  <a href="add.html">Add New Job</a>
-  <a href="index.html">Back to Home</a>
+  function getJobs() {
+    return JSON.parse(localStorage.getItem('jobs') || '[]');
+  }
 
+  function saveJobs(jobs) {
+    localStorage.setItem('jobs', JSON.stringify(jobs));
+  }
+
+  function deleteJob(id) {
+    if (!confirm('Remove this application?')) return;
+    const jobs = getJobs().filter(j => j.id !== id);
+    saveJobs(jobs);
+    renderAll();
+  }
+
+  function setFilter(btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderTable();
+  }
+
+  function isDeadlineSoon(deadline) {
+    if (!deadline) return false;
+    const diff = (new Date(deadline) - new Date()) / (1000 * 60 * 60 * 24);
+    return diff >= 0 && diff <= 7;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    const [y, m, d] = dateStr.split('-');
+    return `${m}/${d}/${y}`;
+  }
+
+  function renderStats(jobs) {
+    document.getElementById('count-total').textContent = jobs.length;
+    document.getElementById('count-applied').textContent = jobs.filter(j => j.status === 'Applied').length;
+    document.getElementById('count-interview').textContent = jobs.filter(j => j.status === 'Interview').length;
+    document.getElementById('count-offer').textContent = jobs.filter(j => j.status === 'Offer').length;
+    document.getElementById('count-rejected').textContent = jobs.filter(j => j.status === 'Rejected').length;
+  }
+
+  function renderTable() {
+    const jobs = getJobs();
+    const search = document.getElementById('search').value.toLowerCase();
+
+    const filtered = jobs
+      .filter(j => currentFilter === 'All' || j.status === currentFilter)
+      .filter(j =>
+        j.company.toLowerCase().includes(search) ||
+        j.role.toLowerCase().includes(search)
+      )
+      .sort((a, b) => b.id - a.id); // newest first
+
+    const tbody = document.getElementById('job-table');
+    const empty = document.getElementById('empty-state');
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+
+    empty.style.display = 'none';
+    tbody.innerHTML = filtered.map(j => `
+      <tr>
+        <td>
+          <div class="company-name">${escHtml(j.company)}</div>
+          <div class="role-name">${escHtml(j.role)}</div>
+          ${j.location ? `<div class="role-name">📍 ${escHtml(j.location)}</div>` : ''}
+        </td>
+        <td><span class="badge badge-${j.status}">${j.status}</span></td>
+        <td class="date-text">${formatDate(j.date)}</td>
+        <td class="date-text">
+          ${j.deadline ? formatDate(j.deadline) : '—'}
+          ${isDeadlineSoon(j.deadline) ? '<div class="deadline-soon">⚠ Soon</div>' : ''}
+        </td>
+        <td>
+          <button class="btn-delete" onclick="deleteJob(${j.id})">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function renderAll() {
+    const jobs = getJobs();
+    renderStats(jobs);
+    renderTable();
+  }
+
+  renderAll();
+</script>
 </body>
 </html>
