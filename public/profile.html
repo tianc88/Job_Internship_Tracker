@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile — Job Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3a;--accent:#6c63ff;--text:#e8eaf0;--muted:#7a7f9a;--danger:#ff5c7a;--success:#00d4aa}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:32px 24px;background-image:radial-gradient(ellipse at 10% 10%,rgba(108,99,255,.07) 0%,transparent 55%),radial-gradient(ellipse at 90% 90%,rgba(0,212,170,.05) 0%,transparent 55%)}
+    .container{max-width:720px;margin:0 auto}
+    /* Navbar */
+    .navbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:12px}
+    .nav-left{display:flex;align-items:center;gap:16px}
+    .logo{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--accent);display:flex;align-items:center;gap:6px;text-decoration:none}
+    .logo::before{content:'◈';font-size:1.2rem}
+    .nav-right{display:flex;gap:10px;align-items:center}
+    .btn-nav{display:inline-flex;align-items:center;gap:6px;text-decoration:none;padding:10px 16px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:600;transition:all .2s;border:none;cursor:pointer}
+    .btn-dashboard{background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+    .btn-dashboard:hover{border-color:var(--accent);color:var(--text)}
+    .btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted)}
+    .btn-logout:hover{border-color:var(--danger);color:var(--danger);background:rgba(255,92,122,.08)}
+    /* Page header */
+    .page-header{margin-bottom:28px}
+    .page-header h1{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--text) 30%,var(--muted) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+    .page-header p{color:var(--muted);font-size:.9rem}
+    /* Avatar */
+    .avatar-section{display:flex;align-items:center;gap:20px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px}
+    .avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#00d4aa);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:white;flex-shrink:0}
+    .avatar-info h2{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:4px}
+    .avatar-info p{color:var(--muted);font-size:.875rem}
+    /* Cards */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+    .card-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px;color:var(--text)}
+    .card-title .icon{font-size:1.1rem}
+    /* Fields */
+    .field{margin-bottom:18px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    label{display:block;font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+    input[type=text],input[type=email],input[type=url],select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+    input::placeholder,textarea::placeholder{color:var(--muted)}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.15)}
+    select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7f9a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;background-color:var(--bg)}
+    select option{background:var(--surface)}
+    textarea{resize:vertical;min-height:80px;line-height:1.5}
+    /* Skills tags */
+    .tags-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .tag{display:inline-flex;align-items:center;gap:6px;background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.25);color:#a09cff;padding:5px 12px;border-radius:20px;font-size:.82rem;font-weight:500}
+    .tag-remove{cursor:pointer;color:var(--muted);font-size:.9rem;transition:color .2s;background:none;border:none;padding:0;line-height:1}
+    .tag-remove:hover{color:var(--danger)}
+    .tag-input-wrap{display:flex;gap:8px;margin-top:8px}
+    .tag-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s}
+    .tag-input:focus{border-color:var(--accent)}
+    .tag-input::placeholder{color:var(--muted)}
+    .btn-tag{background:var(--accent);color:white;border:none;border-radius:10px;padding:9px 16px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .btn-tag:hover{background:#7c74ff}
+    /* Resume upload */
+    .resume-zone{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+    .resume-zone:hover,.resume-zone.drag-over{border-color:var(--accent);background:rgba(108,99,255,.05)}
+    .resume-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .resume-icon{font-size:2rem;margin-bottom:10px}
+    .resume-zone p{color:var(--muted);font-size:.875rem;line-height:1.6}
+    .resume-zone strong{color:var(--accent)}
+    .resume-current{display:flex;align-items:center;gap:12px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);border-radius:10px;padding:14px 16px;margin-top:12px}
+    .resume-current-icon{font-size:1.4rem}
+    .resume-current-info{flex:1}
+    .resume-current-name{font-weight:600;font-size:.9rem;color:var(--success)}
+    .resume-current-size{color:var(--muted);font-size:.78rem;margin-top:2px}
+    .resume-current-actions{display:flex;gap:8px}
+    .btn-resume-action{background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.78rem;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center}
+    .btn-resume-action:hover{border-color:var(--accent);color:var(--accent)}
+    .btn-resume-delete:hover{border-color:var(--danger);color:var(--danger)}
+    /* Save button */
+    .btn-save{background:var(--accent);color:white;border:none;border-radius:12px;padding:13px 28px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(108,99,255,.35)}
+    .btn-save:hover{background:#7c74ff;transform:translateY(-1px)}
+    .btn-save:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    /* Alerts */
+    .alert{padding:12px 16px;border-radius:10px;font-size:.875rem;margin-bottom:16px;display:none}
+    .alert-error{background:rgba(255,92,122,.1);border:1px solid rgba(255,92,122,.3);color:#ff7a94}
+    .alert-success{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);color:var(--success)}
+    .save-row{display:flex;align-items:center;gap:16px;margin-top:8px}
+    .save-status{font-size:.875rem;color:var(--success);opacity:0;transition:opacity .3s}
+    .save-status.show{opacity:1}
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="nav-left">
+      <a href="index.html" class="logo">Job Tracker</a>
+    </div>
+    <div class="nav-right">
+      <a href="dashboard.html" class="btn-nav btn-dashboard">← Dashboard</a>
+      <button class="btn-nav btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1>Your Profile</h1>
+    <p>Personal info, job preferences, and resume — all in one place</p>
+  </div>
+
+  <div class="alert alert-error" id="error"></div>
+  <div class="alert alert-success" id="successMsg"></div>
+
+  <!-- Avatar card -->
+  <div class="avatar-section">
+    <div class="avatar" id="avatarInitials">?</div>
+    <div class="avatar-info">
+      <h2 id="avatarName">Loading...</h2>
+      <p id="avatarEmail"></p>
+    </div>
+  </div>
+
+  <!-- Personal Info -->
+  <div class="card">
+    <div class="card-title"><span class="icon">👤</span> Personal Info</div>
+    <div class="row">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="name" placeholder="Your full name"/>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="you@example.com" disabled style="opacity:.6;cursor:not-allowed"/>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Phone (optional)</label>
+        <input type="text" id="phone" placeholder="e.g. (555) 123-4567"/>
+      </div>
+      <div class="field">
+        <label>Location (optional)</label>
+        <input type="text" id="location" placeholder="e.g. Las Cruces, NM"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>LinkedIn URL (optional)</label>
+      <input type="url" id="linkedin" placeholder="https://linkedin.com/in/yourname"/>
+    </div>
+    <div class="field">
+      <label>GitHub URL (optional)</label>
+      <input type="url" id="github" placeholder="https://github.com/yourname"/>
+    </div>
+    <div class="field">
+      <label>Bio / Summary (optional)</label>
+      <textarea id="bio" placeholder="Brief summary about yourself, your goals, or experience..."></textarea>
+    </div>
+  </div>
+
+  <!-- Job Preferences -->
+  <div class="card">
+    <div class="card-title"><span class="icon">🎯</span> Job Preferences</div>
+    <div class="row">
+      <div class="field">
+        <label>Desired Role</label>
+        <input type="text" id="desiredRole" placeholder="e.g. Software Engineer Intern"/>
+      </div>
+      <div class="field">
+        <label>Job Type</label>
+        <select id="jobType">
+          <option value="">Any</option>
+          <option value="Internship">Internship</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Contract">Contract</option>
+          <option value="Co-op">Co-op</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Preferred Location</label>
+        <input type="text" id="prefLocation" placeholder="e.g. Remote, Austin TX"/>
+      </div>
+      <div class="field">
+        <label>Work Style</label>
+        <select id="workStyle">
+          <option value="">No preference</option>
+          <option value="Remote">Remote</option>
+          <option value="Hybrid">Hybrid</option>
+          <option value="On-site">On-site</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Expected Salary (optional)</label>
+        <input type="text" id="salary" placeholder="e.g. $25/hr or $80,000/yr"/>
+      </div>
+      <div class="field">
+        <label>Availability</label>
+        <input type="text" id="availability" placeholder="e.g. May 2026, Immediate"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Industries of Interest (optional)</label>
+      <input type="text" id="industries" placeholder="e.g. Tech, Finance, Healthcare"/>
+    </div>
+  </div>
+
+  <!-- Skills -->
+  <div class="card">
+    <div class="card-title"><span class="icon">⚡</span> Skills</div>
+    <div class="tags-wrap" id="skillTags"></div>
+    <div class="tag-input-wrap">
+      <input class="tag-input" type="text" id="skillInput" placeholder="Type a skill and press Add (e.g. Python, React, SQL)"/>
+      <button class="btn-tag" onclick="addSkill()">Add</button>
+    </div>
+  </div>
+
+  <!-- Resume -->
+  <div class="card">
+    <div class="card-title"><span class="icon">📄</span> Resume</div>
+    <div id="resumeCurrentWrap" style="display:none">
+      <div class="resume-current">
+        <div class="resume-current-icon">📎</div>
+        <div class="resume-current-info">
+          <div class="resume-current-name" id="resumeName"></div>
+          <div class="resume-current-size" id="resumeSize"></div>
+        </div>
+        <div class="resume-current-actions">
+          <a class="btn-resume-action" id="resumeDownload" download>Download</a>
+          <button class="btn-resume-action btn-resume-delete" onclick="deleteResume()">Remove</button>
+        </div>
+      </div>
+    </div>
+    <div class="resume-zone" id="resumeZone" style="margin-top:12px">
+      <input type="file" id="resumeFile" accept=".pdf,.doc,.docx" onchange="handleResumeSelect(this)"/>
+      <div class="resume-icon">📂</div>
+      <p><strong>Click to upload</strong> or drag and drop your resume<br/>PDF, DOC, or DOCX — max 5MB</p>
+    </div>
+    <p id="resumeSelected" style="color:var(--success);font-size:.85rem;margin-top:10px;display:none"></p>
+  </div>
+
+  <!-- Save -->
+  <div class="save-row">
+    <button class="btn-save" id="saveBtn" onclick="saveProfile()">Save Profile</button>
+    <span class="save-status" id="saveStatus">✓ Profile saved!</span>
+  </div>
+
+</div>
+
+<script>
+  let skills = [];
+  let resumeFile = null;
+  let existingResumeData = null;
+
+  // Auth check + load profile
+  async function init() {
+    const me = await fetch('/api/me').then(r => r.json());
+    if (!me.loggedIn) { location.href = 'login.html'; return; }
+
+    // Set avatar
+    document.getElementById('avatarName').textContent = me.name;
+    document.getElementById('avatarInitials').textContent = me.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+    // Load profile data
+    try {
+      const res = await fetch('/api/profile');
+      if (res.ok) {
+        const p = await res.json();
+        document.getElementById('name').value        = p.name || me.name;
+        document.getElementById('email').value       = p.email || '';
+        document.getElementById('phone').value       = p.phone || '';
+        document.getElementById('location').value    = p.location || '';
+        document.getElementById('linkedin').value    = p.linkedin || '';
+        document.getElementById('github').value      = p.github || '';
+        document.getElementById('bio').value         = p.bio || '';
+        document.getElementById('desiredRole').value = p.desiredRole || '';
+        document.getElementById('jobType').value     = p.jobType || '';
+        document.getElementById('prefLocation').value= p.prefLocation || '';
+        document.getElementById('workStyle').value   = p.workStyle || '';
+        document.getElementById('salary').value      = p.salary || '';
+        document.getElementById('availability').value= p.availability || '';
+        document.getElementById('industries').value  = p.industries || '';
+        document.getElementById('avatarEmail').textContent = p.email || '';
+
+        skills = p.skills || [];
+        renderSkills();
+
+        if (p.resume && p.resume.name) {
+          existingResumeData = p.resume;
+          showResumeInfo(p.resume.name, p.resume.size, p.resume.data);
+        }
+      }
+    } catch(e) { console.error(e); }
+  }
+
+  function renderSkills() {
+    const wrap = document.getElementById('skillTags');
+    wrap.innerHTML = skills.map((s, i) => `
+      <span class="tag">${esc(s)}<button class="tag-remove" onclick="removeSkill(${i})">✕</button></span>
+    `).join('');
+  }
+
+  function addSkill() {
+    const input = document.getElementById('skillInput');
+    const val = input.value.trim();
+    if (!val) return;
+    if (!skills.includes(val)) { skills.push(val); renderSkills(); }
+    input.value = '';
+    input.focus();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('skillInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); addSkill(); }
+    });
+  });
+
+  function removeSkill(i) {
+    skills.splice(i, 1);
+    renderSkills();
+  }
+
+  function handleResumeSelect(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { alert('File is too large. Max size is 5MB.'); input.value = ''; return; }
+    resumeFile = file;
+    const el = document.getElementById('resumeSelected');
+    el.textContent = '📎 ' + file.name + ' selected — will be saved when you click Save Profile';
+    el.style.display = 'block';
+  }
+
+  function showResumeInfo(name, size, dataUrl) {
+    document.getElementById('resumeCurrentWrap').style.display = 'block';
+    document.getElementById('resumeName').textContent = name;
+    document.getElementById('resumeSize').textContent = size ? formatSize(size) : '';
+    if (dataUrl) {
+      const dl = document.getElementById('resumeDownload');
+      dl.href = dataUrl;
+      dl.download = name;
+    }
+  }
+
+  function deleteResume() {
+    if (!confirm('Remove your resume?')) return;
+    existingResumeData = null;
+    resumeFile = null;
+    document.getElementById('resumeCurrentWrap').style.display = 'none';
+    document.getElementById('resumeSelected').style.display = 'none';
+    document.getElementById('resumeFile').value = '';
+  }
+
+  async function saveProfile() {
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true; btn.textContent = 'Saving...';
+
+    let resumePayload = existingResumeData || null;
+
+    // Convert new file to base64 if selected
+    if (resumeFile) {
+      resumePayload = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({
+          name: resumeFile.name,
+          size: resumeFile.size,
+          data: reader.result
+        });
+        reader.onerror = reject;
+        reader.readAsDataURL(resumeFile);
+      });
+    }
+
+    const payload = {
+      name:         document.getElementById('name').value.trim(),
+      phone:        document.getElementById('phone').value.trim(),
+      location:     document.getElementById('location').value.trim(),
+      linkedin:     document.getElementById('linkedin').value.trim(),
+      github:       document.getElementById('github').value.trim(),
+      bio:          document.getElementById('bio').value.trim(),
+      desiredRole:  document.getElementById('desiredRole').value.trim(),
+      jobType:      document.getElementById('jobType').value,
+      prefLocation: document.getElementById('prefLocation').value.trim(),
+      workStyle:    document.getElementById('workStyle').value,
+      salary:       document.getElementById('salary').value.trim(),
+      availability: document.getElementById('availability').value.trim(),
+      industries:   document.getElementById('industries').value.trim(),
+      skills,
+      resume: resumePayload,
+    };
+
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (resumePayload) showResumeInfo(resumePayload.name, resumePayload.size, resumePayload.data);
+        document.getElementById('resumeSelected').style.display = 'none';
+        resumeFile = null;
+        existingResumeData = resumePayload;
+        const status = document.getElementById('saveStatus');
+        status.classList.add('show');
+        setTimeout(() => status.classList.remove('show'), 3000);
+      } else {
+        showErr(data.error || 'Failed to save.');
+      }
+    } catch { showErr('Could not connect to server.'); }
+
+    btn.disabled = false; btn.textContent = 'Save Profile';
+  }
+
+  async function logout() {
+    await fetch('/api/logout', { method: 'POST' });
+    location.href = 'login.html';
+  }
+
+  function showErr(msg) {
+    const el = document.getElementById('error');
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/(1024*1024)).toFixed(1) + ' MB';
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  init();
+</script>
+</body>
+</html>
