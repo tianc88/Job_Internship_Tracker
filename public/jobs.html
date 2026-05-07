@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Search Jobs</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #f4f6f8;
+      text-align: center;
+      padding: 40px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 8px;
+      width: 220px;
+    }
+
+    button, a {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .job-card {
+      background: white;
+      margin: 15px auto;
+      padding: 15px;
+      width: 520px;
+      border-radius: 6px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Search External Jobs</h1>
+  <p>Search real job listings using Adzuna API.</p>
+
+  <input id="role" placeholder="Role, e.g. intern">
+  <input id="location" placeholder="Location, e.g. New Mexico">
+  <button onclick="searchJobs()">Search</button>
+
+  <div id="results">
+    <p>Click Search to load jobs.</p>
+  </div>
+
+  <br>
+  <a href="index.html">Back to Home</a>
+
+  <script>
+    async function searchJobs() {
+      const role = document.getElementById("role").value || "software intern";
+      const location = document.getElementById("location").value || "New Mexico";
+      const results = document.getElementById("results");
+
+      results.innerHTML = "<p>Loading jobs...</p>";
+
+      try {
+        const response = await fetch(`/api/jobs?role=${encodeURIComponent(role)}&location=${encodeURIComponent(location)}`);
+
+        if (!response.ok) {
+          results.innerHTML = "<p>API error. Check server or API keys.</p>";
+          return;
+        }
+
+        const jobs = await response.json();
+        results.innerHTML = "";
+
+        if (!jobs || jobs.length === 0) {
+          results.innerHTML = "<p>No jobs found.</p>";
+          return;
+        }
+
+        jobs.forEach(job => {
+          results.innerHTML += `
+            <div class="job-card">
+              <h3>${job.title || "No title"}</h3>
+              <p><strong>Company:</strong> ${job.company?.display_name || "N/A"}</p>
+              <p><strong>Location:</strong> ${job.location?.display_name || "N/A"}</p>
+              <a href="${job.redirect_url}" target="_blank">View Job</a>
+            </div>
+          `;
+        });
+
+      } catch (error) {
+        console.error(error);
+        results.innerHTML = "<p>Error loading jobs.</p>";
+      }
+    }
+  </script>
+</body>
+</html>

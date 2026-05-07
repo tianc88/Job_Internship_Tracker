@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/tianc88/Job_Internship_Tracker#readme",
   "dependencies": {
+    "dotenv": "^17.4.2",
     "express": "^5.2.1"
   }
 }

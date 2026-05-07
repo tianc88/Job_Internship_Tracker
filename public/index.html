@@ -11,24 +11,36 @@
       padding: 40px;
     }
 
-    h1, h2 {
+    h1 {
       color: #333;
       margin-bottom: 10px;
     }
 
     p {
       color: #555;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      width: 400px;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
 
     a {
-      display: inline-block;
-      margin: 10px;
-      padding: 10px 15px;
+      display: block;
+      margin: 12px auto;
+      padding: 12px;
+      width: 80%;
       background-color: #007bff;
       color: white;
       text-decoration: none;
       border-radius: 5px;
       transition: 0.3s;
+      font-weight: bold;
     }
 
     a:hover {
@@ -38,10 +50,15 @@
 </head>
 
 <body>
-  <h1>Internship / Job Tracker</h1>
-  <p>Prototype web application for tracking job and internship applications.</p>
 
-  <a href="dashboard.html">Go to Dashboard</a>
-  <a href="add.html">Add New Job</a>
+  <div class="container">
+    <h1>Internship / Job Tracker</h1>
+    <p>Track and search job opportunities easily</p>
+
+    <a href="dashboard.html">Dashboard</a>
+    <a href="add.html">Add New Job</a>
+    <a href="jobs.html">Search External Jobs</a>
+  </div>
+
 </body>
 </html>
