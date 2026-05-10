@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Forgot Password — Job Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3a;--accent:#6c63ff;--text:#e8eaf0;--muted:#7a7f9a;--success:#00d4aa}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background-image:radial-gradient(ellipse at 20% 20%,rgba(108,99,255,.09) 0%,transparent 60%)}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 44px;width:100%;max-width:420px;box-shadow:0 24px 80px rgba(0,0,0,.4);animation:fadeUp .5s ease}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .logo{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--accent);letter-spacing:.02em;margin-bottom:28px;display:flex;align-items:center;gap:8px}
+    .logo::before{content:'◈';font-size:1.3rem}
+    h1{font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;margin-bottom:6px;background:linear-gradient(135deg,var(--text) 30%,var(--muted) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .subtitle{color:var(--muted);font-size:.9rem;margin-bottom:32px}
+    .field{margin-bottom:18px}
+    label{display:block;font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+    input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s,box-shadow .2s}
+    input::placeholder{color:var(--muted)}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.15)}
+    .btn{width:100%;padding:13px;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:6px}
+    .btn-primary{background:var(--accent);color:white;box-shadow:0 4px 20px rgba(108,99,255,.35)}
+    .btn-primary:hover{background:#7c74ff;transform:translateY(-1px)}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-size:.85rem;margin-top:20px;transition:color .2s}
+    .back:hover{color:var(--text)}
+    .back::before{content:'←'}
+    .alert{padding:12px 16px;border-radius:10px;font-size:.875rem;margin-bottom:16px;display:none}
+    .alert-error{background:rgba(255,92,122,.1);border:1px solid rgba(255,92,122,.3);color:#ff7a94}
+    .alert-success{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);color:var(--success)}
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">Job Tracker</div>
+  <h1>Reset password</h1>
+  <p class="subtitle">Enter your email and we'll send you a reset link</p>
+  <div class="alert alert-error" id="error"></div>
+  <div class="alert alert-success" id="success"></div>
+  <div class="field">
+    <label>Email</label>
+    <input type="email" id="email" placeholder="you@example.com"/>
+  </div>
+  <button class="btn btn-primary" id="sendBtn" onclick="sendReset()">Send Reset Link</button>
+  <br/>
+  <a href="login.html" class="back">Back to login</a>
+</div>
+<script>
+  async function sendReset(){
+    const email=document.getElementById('email').value.trim();
+    const btn=document.getElementById('sendBtn');
+    document.getElementById('error').style.display='none';
+    document.getElementById('success').style.display='none';
+    if(!email){showErr('Please enter your email.');return;}
+    btn.disabled=true;btn.textContent='Sending...';
+    try{
+      const res=await fetch('/api/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+      const data=await res.json();
+      if(data.success){
+        const el=document.getElementById('success');
+        el.textContent='If that email exists, a reset link has been sent. Check your inbox.';
+        el.style.display='block';
+        btn.textContent='Sent!';
+      } else {
+        showErr(data.error||'Something went wrong.');
+        btn.disabled=false;btn.textContent='Send Reset Link';
+      }
+    }catch{showErr('Could not connect to server.');btn.disabled=false;btn.textContent='Send Reset Link';}
+  }
+  function showErr(msg){const el=document.getElementById('error');el.textContent=msg;el.style.display='block';}
+</script>
+</body>
+</html>
