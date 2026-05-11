@@ -4,121 +4,471 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Add Application — Job Tracker</title>
+
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0f1117;--surface:#1a1d27;--border:#2a2d3a;--accent:#6c63ff;--text:#e8eaf0;--muted:#7a7f9a;--success:#00d4aa}
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background-image:radial-gradient(ellipse at 20% 20%,rgba(108,99,255,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(0,212,170,.06) 0%,transparent 60%)}
-    .back-link{position:fixed;top:24px;left:28px;color:var(--muted);text-decoration:none;font-size:.85rem;display:flex;align-items:center;gap:6px;transition:color .2s}
-    .back-link:hover{color:var(--text)}
-    .back-link::before{content:'←';font-size:1rem}
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 44px;width:100%;max-width:460px;box-shadow:0 24px 80px rgba(0,0,0,.4)}
-    .card-header{margin-bottom:32px}
-    .card-header h1{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,var(--text) 0%,var(--muted) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
-    .card-header p{color:var(--muted);font-size:.9rem}
-    .field{margin-bottom:20px}
-    label{display:block;font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
-    input,textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s,box-shadow .2s}
-    input::placeholder,textarea::placeholder{color:var(--muted)}
-    input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.15)}
-    textarea{resize:vertical;min-height:80px}
-    .status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .status-option{position:relative}
-    .status-option input[type=radio]{position:absolute;opacity:0;width:0}
-    .status-option label{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 8px;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;text-transform:none;letter-spacing:0;font-size:.83rem;font-weight:500;color:var(--muted);gap:6px}
-    .status-option label .dot{width:8px;height:8px;border-radius:50%}
-    .status-option input:checked+label{background:rgba(108,99,255,.1);border-color:var(--accent);color:var(--text)}
-    .status-option label:hover{border-color:var(--accent);color:var(--text)}
-    .dot-applied{background:#6c63ff}.dot-interview{background:#f5a623}.dot-offer{background:#00d4aa}.dot-rejected{background:#ff5c7a}.dot-saved{background:#7a7f9a}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .btn{width:100%;padding:14px;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:8px}
-    .btn-primary{background:var(--accent);color:white;box-shadow:0 4px 20px rgba(108,99,255,.35)}
-    .btn-primary:hover{background:#7c74ff;transform:translateY(-1px)}
-    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
-    .alert{padding:12px 16px;border-radius:10px;font-size:.875rem;margin-bottom:16px;display:none}
-    .alert-error{background:rgba(255,92,122,.1);border:1px solid rgba(255,92,122,.3);color:#ff7a94}
-    .toast{position:fixed;bottom:28px;right:28px;background:var(--surface);border:1px solid var(--success);color:var(--success);padding:14px 20px;border-radius:12px;font-size:.9rem;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.4);transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
-    .toast.show{transform:translateY(0);opacity:1}
+    *,*::before,*::after{
+      box-sizing:border-box;
+      margin:0;
+      padding:0
+    }
+
+    :root{
+      --bg:#0f1117;
+      --surface:#1a1d27;
+      --border:#2a2d3a;
+      --accent:#6c63ff;
+      --text:#e8eaf0;
+      --muted:#7a7f9a;
+      --success:#00d4aa
+    }
+
+    body{
+      font-family:'DM Sans',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:40px 20px;
+      background-image:
+        radial-gradient(ellipse at 20% 20%,rgba(108,99,255,.08) 0%,transparent 60%),
+        radial-gradient(ellipse at 80% 80%,rgba(0,212,170,.06) 0%,transparent 60%)
+    }
+
+    .back-link{
+      position:fixed;
+      top:24px;
+      left:28px;
+      color:var(--muted);
+      text-decoration:none;
+      font-size:.85rem;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      transition:color .2s
+    }
+
+    .back-link:hover{
+      color:var(--text)
+    }
+
+    .back-link::before{
+      content:'←';
+      font-size:1rem
+    }
+
+    .card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:40px 44px;
+      width:100%;
+      max-width:460px;
+      box-shadow:0 24px 80px rgba(0,0,0,.4)
+    }
+
+    .card-header{
+      margin-bottom:32px
+    }
+
+    .card-header h1{
+      font-family:'Syne',sans-serif;
+      font-size:1.9rem;
+      font-weight:800;
+      background:linear-gradient(135deg,var(--text) 0%,var(--muted) 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      margin-bottom:6px
+    }
+
+    .card-header p{
+      color:var(--muted);
+      font-size:.9rem
+    }
+
+    .field{
+      margin-bottom:20px
+    }
+
+    label{
+      display:block;
+      font-size:.75rem;
+      font-weight:600;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      margin-bottom:8px
+    }
+
+    input,textarea{
+      width:100%;
+      background:var(--bg);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:12px 16px;
+      color:var(--text);
+      font-family:'DM Sans',sans-serif;
+      font-size:.95rem;
+      outline:none;
+      transition:border-color .2s,box-shadow .2s
+    }
+
+    input::placeholder,
+    textarea::placeholder{
+      color:var(--muted)
+    }
+
+    input:focus,
+    textarea:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(108,99,255,.15)
+    }
+
+    textarea{
+      resize:vertical;
+      min-height:80px
+    }
+
+    .status-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px
+    }
+
+    .status-option{
+      position:relative
+    }
+
+    .status-option input[type=radio]{
+      position:absolute;
+      opacity:0;
+      width:0
+    }
+
+    .status-option label{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:12px 8px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      cursor:pointer;
+      transition:all .2s;
+      text-transform:none;
+      letter-spacing:0;
+      font-size:.83rem;
+      font-weight:500;
+      color:var(--muted);
+      gap:6px
+    }
+
+    .status-option label .dot{
+      width:8px;
+      height:8px;
+      border-radius:50%
+    }
+
+    .status-option input:checked+label{
+      background:rgba(108,99,255,.1);
+      border-color:var(--accent);
+      color:var(--text)
+    }
+
+    .status-option label:hover{
+      border-color:var(--accent);
+      color:var(--text)
+    }
+
+    .dot-applied{background:#6c63ff}
+    .dot-interview{background:#f5a623}
+    .dot-offer{background:#00d4aa}
+    .dot-rejected{background:#ff5c7a}
+    .dot-saved{background:#7a7f9a}
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px
+    }
+
+    .btn{
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:12px;
+      font-family:'DM Sans',sans-serif;
+      font-size:.95rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:all .2s;
+      margin-top:8px
+    }
+
+    .btn-primary{
+      background:var(--accent);
+      color:white;
+      box-shadow:0 4px 20px rgba(108,99,255,.35)
+    }
+
+    .btn-primary:hover{
+      background:#7c74ff;
+      transform:translateY(-1px)
+    }
+
+    .btn-primary:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      transform:none
+    }
+
+    .alert{
+      padding:12px 16px;
+      border-radius:10px;
+      font-size:.875rem;
+      margin-bottom:16px;
+      display:none
+    }
+
+    .alert-error{
+      background:rgba(255,92,122,.1);
+      border:1px solid rgba(255,92,122,.3);
+      color:#ff7a94
+    }
+
+    .toast{
+      position:fixed;
+      bottom:28px;
+      right:28px;
+      background:var(--surface);
+      border:1px solid var(--success);
+      color:var(--success);
+      padding:14px 20px;
+      border-radius:12px;
+      font-size:.9rem;
+      font-weight:500;
+      box-shadow:0 8px 32px rgba(0,0,0,.4);
+      transform:translateY(80px);
+      opacity:0;
+      transition:all .35s cubic-bezier(.34,1.56,.64,1)
+    }
+
+    .toast.show{
+      transform:translateY(0);
+      opacity:1
+    }
   </style>
 </head>
+
 <body>
+
 <a href="dashboard.html" class="back-link">Back to Dashboard</a>
+
 <div class="card">
+
   <div class="card-header">
     <h1>Add Application</h1>
     <p>Log a new job or internship</p>
   </div>
+
   <div class="alert alert-error" id="error"></div>
+
   <div class="field">
     <label>Company</label>
     <input type="text" id="company" placeholder="e.g. Google, Amazon, Stripe"/>
   </div>
+
   <div class="field">
     <label>Role</label>
     <input type="text" id="role" placeholder="e.g. Software Engineer Intern"/>
   </div>
+
   <div class="row">
+
     <div class="field">
-      <label>Date Applied</label>
+      <label>Date Applied (required unless Saved)</label>
       <input type="date" id="date"/>
     </div>
+
     <div class="field">
-      <label>Deadline (optional)</label>
+      <label>Deadline (required for Saved)</label>
       <input type="date" id="deadline"/>
     </div>
+
   </div>
+
   <div class="field">
     <label>Location (optional)</label>
     <input type="text" id="location" placeholder="e.g. Remote, Austin TX"/>
   </div>
+
   <div class="field">
+
     <label>Status</label>
+
     <div class="status-grid">
-      <div class="status-option"><input type="radio" name="status" id="s-saved" value="Saved"/><label for="s-saved"><span class="dot dot-saved"></span>Saved</label></div>
-      <div class="status-option"><input type="radio" name="status" id="s-applied" value="Applied" checked/><label for="s-applied"><span class="dot dot-applied"></span>Applied</label></div>
-      <div class="status-option"><input type="radio" name="status" id="s-interview" value="Interview"/><label for="s-interview"><span class="dot dot-interview"></span>Interview</label></div>
-      <div class="status-option"><input type="radio" name="status" id="s-offer" value="Offer"/><label for="s-offer"><span class="dot dot-offer"></span>Offer</label></div>
-      <div class="status-option"><input type="radio" name="status" id="s-rejected" value="Rejected"/><label for="s-rejected"><span class="dot dot-rejected"></span>Rejected</label></div>
+
+      <div class="status-option">
+        <input type="radio" name="status" id="s-saved" value="Saved"/>
+        <label for="s-saved">
+          <span class="dot dot-saved"></span>
+          Saved
+        </label>
+      </div>
+
+      <div class="status-option">
+        <input type="radio" name="status" id="s-applied" value="Applied" checked/>
+        <label for="s-applied">
+          <span class="dot dot-applied"></span>
+          Applied
+        </label>
+      </div>
+
+      <div class="status-option">
+        <input type="radio" name="status" id="s-interview" value="Interview"/>
+        <label for="s-interview">
+          <span class="dot dot-interview"></span>
+          Interview
+        </label>
+      </div>
+
+      <div class="status-option">
+        <input type="radio" name="status" id="s-offer" value="Offer"/>
+        <label for="s-offer">
+          <span class="dot dot-offer"></span>
+          Offer
+        </label>
+      </div>
+
+      <div class="status-option">
+        <input type="radio" name="status" id="s-rejected" value="Rejected"/>
+        <label for="s-rejected">
+          <span class="dot dot-rejected"></span>
+          Rejected
+        </label>
+      </div>
+
     </div>
+
   </div>
+
   <div class="field">
     <label>Notes (optional)</label>
     <textarea id="notes" placeholder="Recruiter name, referral, anything useful..."></textarea>
   </div>
-  <button class="btn btn-primary" id="saveBtn" onclick="saveJob()">Save Application</button>
+
+  <button class="btn btn-primary" id="saveBtn" onclick="saveJob()">
+    Save Application
+  </button>
+
 </div>
-<div class="toast" id="toast">✓ Application saved!</div>
+
+<div class="toast" id="toast">
+  ✓ Application saved!
+</div>
+
 <script>
-  // Auth check
-  fetch('/api/me').then(r=>r.json()).then(d=>{if(!d.loggedIn)location.href='login.html';});
-  document.getElementById('date').valueAsDate=new Date();
+
+  fetch('/api/me')
+    .then(r => r.json())
+    .then(d => {
+      if(!d.loggedIn){
+        location.href='login.html';
+      }
+    });
+
+  document.getElementById('date').valueAsDate = new Date();
 
   async function saveJob(){
-    const company=document.getElementById('company').value.trim();
-    const role=document.getElementById('role').value.trim();
-    const date_applied=document.getElementById('date').value;
-    const deadline=document.getElementById('deadline').value;
-    const location=document.getElementById('location').value.trim();
-    const status=document.querySelector('input[name="status"]:checked').value;
-    const notes=document.getElementById('notes').value.trim();
-    const btn=document.getElementById('saveBtn');
-    const errEl=document.getElementById('error');
-    errEl.style.display='none';
-    if(!company||!role){showErr('Company and Role are required.');return;}
-    btn.disabled=true;btn.textContent='Saving...';
+
+    const company = document.getElementById('company').value.trim();
+    const role = document.getElementById('role').value.trim();
+    const date_applied = document.getElementById('date').value;
+    const deadline = document.getElementById('deadline').value;
+    const location = document.getElementById('location').value.trim();
+    const status = document.querySelector('input[name="status"]:checked').value;
+    const notes = document.getElementById('notes').value.trim();
+
+    const btn = document.getElementById('saveBtn');
+    const errEl = document.getElementById('error');
+
+    errEl.style.display = 'none';
+
+    if(!company || !role){
+      showErr('Company and Role are required.');
+      return;
+    }
+
+    if(status === 'Saved' && !deadline){
+      showErr('Deadline is required for Saved jobs.');
+      return;
+    }
+
+    if(status !== 'Saved' && !date_applied){
+      showErr('Date Applied is required for Applied, Interview, Offer, or Rejected jobs.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
     try{
-      const res=await fetch('/api/jobs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({company,role,status,date_applied,deadline,location,notes})});
-      const data=await res.json();
+
+      const res = await fetch('/api/jobs', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({
+          company,
+          role,
+          status,
+          date_applied,
+          deadline,
+          location,
+          notes
+        })
+      });
+
+      const data = await res.json();
+
       if(data.success){
+
         document.getElementById('toast').classList.add('show');
-        setTimeout(()=>location.href='dashboard.html',1200);
+
+        setTimeout(() => {
+          location.href = 'dashboard.html';
+        }, 1200);
+
       } else {
-        showErr(data.error||'Failed to save.');
-        btn.disabled=false;btn.textContent='Save Application';
+
+        showErr(data.error || 'Failed to save.');
+
+        btn.disabled = false;
+        btn.textContent = 'Save Application';
       }
-    }catch{showErr('Could not connect to server.');btn.disabled=false;btn.textContent='Save Application';}
+
+    } catch {
+
+      showErr('Could not connect to server.');
+
+      btn.disabled = false;
+      btn.textContent = 'Save Application';
+    }
   }
-  function showErr(msg){const el=document.getElementById('error');el.textContent=msg;el.style.display='block';}
+
+  function showErr(msg){
+    const el = document.getElementById('error');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
 </script>
+
 </body>
 </html>
